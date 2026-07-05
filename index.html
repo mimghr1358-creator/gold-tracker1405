@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت و ردیاب سرمایه‌گذاری طلا</title>
+    <!-- ابزارهای لازم برای اجرای خودکار جاوااسکریپت و طراحی ظاهر برنامه -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #020617; color: #f8fafc; font-family: Tahoma, sans-serif; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function App() {
+            // قیمت‌های پیش‌فرض بازار طلا و ارز به ریال
+            const [prices, setPrices] = React.useState({
+                gold18k: 174627000,
+                emami: 1770000000,
+                usdToIrr: 612000
+            });
+            const [transactions, setTransactions] = React.useState([
+                { id: 1, type: "طلای ۱۸ عیار", action: "buy", amount: 100000000, rate: 165000000, qty: 0.606, date: "1405/01/15" }
+            ]);
+            
+            const [amount, setAmount] = React.useState("");
+            const [rate, setRate] = React.useState("");
+
+            const handleAddTransaction = (e) => {
+                e.preventDefault();
+                const amt = parseFloat(amount);
+                const rt = parseFloat(rate);
+                if (isNaN(amt) || isNaN(rt)) return;
+
+                const newTx = {
+                    id: Date.now(),
+                    type: "طلای ۱۸ عیار (گرمی)",
+                    action: "buy",
+                    amount: amt,
+                    rate: rt,
+                    qty: parseFloat((amt / rt).toFixed(4)),
+                    date: "امروز"
+                };
+
+                setTransactions([newTx, ...transactions]);
+                setAmount("");
+                setRate("");
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-950 text-slate-100 p-4 max-w-md mx-auto space-y-6 pb-16">
+                    <header className="text-center border-b border-slate-800 pb-3">
+                        <h1 className="text-lg font-bold text-amber-400">مدیریت و ردیاب سرمایه‌گذاری طلا</h1>
+                        <p className="text-[10px] text-slate-400">محاسبه دقیق سود و زیان ریالی</p>
+                    </header>
+
+                    {/* ویجت قیمت‌ها */}
+                    <section className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <h2 className="text-xs font-bold text-slate-300">قیمت‌های مبنای بازار طلا (ریال)</h2>
+                        <div className="flex justify-between text-xs bg-slate-950 p-2.5 rounded border border-slate-800">
+                            <span>طلای ۱۸ عیار (گرم):</span>
+                            <span className="text-amber-400 font-bold">{prices.gold18k.toLocaleString("fa-IR")} ریال</span>
+                        </div>
+                        <div className="flex justify-between text-xs bg-slate-950 p-2.5 rounded border border-slate-800">
+                            <span>سکه امامی:</span>
+                            <span className="text-amber-400 font-bold">{prices.emami.toLocaleString("fa-IR")} ریال</span>
+                        </div>
+                    </section>
+
+                    {/* فرم ثبت معامله */}
+                    <form onSubmit={handleAddTransaction} className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <h3 className="text-xs font-bold text-amber-400">ثبت فاکتور سرمایه‌گذاری جدید طلا</h3>
+                        <div>
+                            <label className="text-[11px] text-slate-400 block mb-1">کل مبلغ پرداخت شده (به ریال)</label>
+                            <input 
+                                type="number" 
+                                placeholder="مثال: 100000000" 
+                                value={amount}
+                                onChange={e => setAmount(e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sm text-slate-200 focus:outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-[11px] text-slate-400 block mb-1">قیمت واحد در زمان خرید (ریال)</label>
+                            <input 
+                                type="number" 
+                                placeholder="مثال: 165000000" 
+                                value={rate}
+                                onChange={e => setRate(e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-sm text-slate-200 focus:outline-none"
+                            />
+                        </div>
+                        <button type="submit" className="w-full bg-amber-500 text-slate-950 font-bold p-2 rounded-xl text-xs transition hover:bg-amber-400">
+                            تایید و ثبت معامله طلا
+                        </button>
+                    </form>
+
+                    {/* تاریخچه معاملات */}
+                    <section className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <h3 className="text-xs font-bold text-slate-300">تاریخچه کامل خرید و فروش‌ها</h3>
+                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                            {transactions.map(tx => (
+                                <div key={tx.id} className="bg-slate-950 p-3 rounded-lg border border-slate-850 flex justify-between items-center text-xs">
+                                    <div>
+                                        <p className="font-bold text-slate-200">{tx.type}</p>
+                                        <p className="text-[10px] text-slate-400">وزن/تعداد: {tx.qty} گرم</p>
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-emerald-400 font-bold">{tx.amount.toLocaleString("fa-IR")} ریال</p>
+                                        <p className="text-[9px] text-slate-500">نرخ خرید: {tx.rate.toLocaleString("fa-IR")}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                </div>
+            );
+        }
+
+        const root = React-DOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
